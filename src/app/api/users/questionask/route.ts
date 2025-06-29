@@ -5,6 +5,7 @@ import Tag from "@/models/tagSchema";
 import { NextRequest, NextResponse } from "next/server";
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 import User from "@/models/userModel";
+import axios from "axios";
 
 connect();
 
@@ -37,11 +38,16 @@ export async function POST(request: NextRequest) {
       author: authorId,
     });
 
-    await User.findByIdAndUpdate(authorId,{
+    await User.findByIdAndUpdate(authorId, {
       $inc: { reputation: +1 },
-    })
-
+    });
     const saved = await newQuestion.save();
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/aiansweradd`,
+      {
+        question: newQuestion._id,
+      }
+    );
     return NextResponse.json({ message: saved, success: true });
   } catch (error: any) {
     console.error("❌ Server Error:", error);

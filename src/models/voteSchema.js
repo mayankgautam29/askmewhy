@@ -1,4 +1,3 @@
-// models/voteModel.ts
 import mongoose from "mongoose";
 
 const voteSchema = new mongoose.Schema(

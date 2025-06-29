@@ -1,4 +1,3 @@
-// models/answerModel.ts
 import mongoose, { Schema } from "mongoose";
 import "@/models/commentModel";
 

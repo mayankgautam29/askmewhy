@@ -9,7 +9,6 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const { id } = await request.json();
-    console.log("ID FROM BACKEND", id);
     let userId = null;
     try {
       userId = await getDataFromToken(request);

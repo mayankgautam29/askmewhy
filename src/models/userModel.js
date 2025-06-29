@@ -30,8 +30,6 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-
-  // ✅ Add this
   createdAt: {
     type: Date,
     default: Date.now,

@@ -46,6 +46,7 @@ export default function QuestionClient({ id }: { id: string }) {
       setLoading(false);
     }
   };
+  const AI_USER_ID = "6860cca69063b953bca49ec3";
 
   const onSubmit = async (data: QuestionData) => {
     try {
@@ -74,7 +75,7 @@ export default function QuestionClient({ id }: { id: string }) {
   const delAnswer = async (e: any, answerId: string) => {
     e.preventDefault();
     await axios.post("/api/users/delanswer", { id: answerId });
-    fetchQuestion(); // Refresh after delete
+    fetchQuestion();
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -83,7 +84,6 @@ export default function QuestionClient({ id }: { id: string }) {
   return (
     <div>
       <section className="mt-10 px-10 py-20 bg-gradient-to-r from-[#0f0f0f] to-[#1a1a1a] rounded-2xl shadow-xl max-w-5xl mx-auto">
-        {/* Question Title, Author, Vote */}
         <div className="flex items-start gap-4 mb-6">
           <VoteButton
             targetId={question._id}
@@ -92,10 +92,11 @@ export default function QuestionClient({ id }: { id: string }) {
           />
           <div>
             <h2 className="text-3xl font-bold">{question.title}</h2>
-            <p className="mt-5">
-              By: {question.author.username}
+            <p className="mt-5">By: {question.author.username}</p>
+            <p className="text-gray-400 mt-2">
+              {" "}
+              <strong> {question.content} </strong>
             </p>
-            <p className="text-gray-400 mt-2"> <strong> {question.content} </strong></p>
           </div>
         </div>
         <div className="mb-4">
@@ -116,7 +117,6 @@ export default function QuestionClient({ id }: { id: string }) {
           </div>
         </div>
 
-        {/* Answers */}
         <div className="mt-10">
           <h3 className="text-2xl font-semibold text-white mb-4">Answers</h3>
           {question.answers?.length > 0 ? (
@@ -135,12 +135,18 @@ export default function QuestionClient({ id }: { id: string }) {
                   key={ans._id || index}
                   className="bg-[#222] text-white rounded-lg p-4 mb-4 shadow"
                 >
+                  {ans.author._id === AI_USER_ID && (
+                    <div className="text-xl font-semibold text-blue-400 mb-2">
+                      ANSWER BY ASKMEWHY AI
+                    </div>
+                  )}
                   <div className="flex gap-4">
                     <VoteButton
                       targetId={ans._id}
                       targetType="answer"
                       initialScore={ans.votes || 0}
                     />
+
                     <p className="text-gray-300">{ans.content}</p>
                   </div>
                   <div className="text-sm text-gray-500 mt-2 flex justify-between">
