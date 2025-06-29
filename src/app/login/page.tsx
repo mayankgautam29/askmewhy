@@ -108,6 +108,7 @@ export default function LoginForm() {
           <ShinyButton type="submit" className="text-white self-center">
             Login
           </ShinyButton>
+          <p className="text-sm">New user? <a className="text-blue-500" href="/signup">Signup Now</a></p>
         </form>
       </div>
     </div>

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const thisQuestion = await Question.findById(question);
     const ques = thisQuestion.content;
     const res = await axios.post(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCrThM0enj_9PgOGScvkZdi129-XSncW34",
+      process.env.ASKMEWHY_API!,
       {
         contents: [
           {
