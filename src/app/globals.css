@@ -140,25 +140,25 @@
   }}
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --radius: 0.75rem;
+  --background: oklch(0.09 0.02 270);
+  --foreground: oklch(0.97 0.01 270);
+  --card: oklch(0.14 0.03 275);
+  --card-foreground: oklch(0.97 0.01 270);
+  --popover: oklch(0.14 0.03 275);
+  --popover-foreground: oklch(0.97 0.01 270);
+  --primary: oklch(0.72 0.17 280);
+  --primary-foreground: oklch(0.12 0.03 280);
+  --secondary: oklch(0.2 0.04 270);
+  --secondary-foreground: oklch(0.95 0.02 270);
+  --muted: oklch(0.22 0.03 270);
+  --muted-foreground: oklch(0.65 0.04 270);
+  --accent: oklch(0.25 0.06 280);
+  --accent-foreground: oklch(0.95 0.02 270);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 10%);
+  --ring: oklch(0.72 0.17 280);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -223,6 +223,35 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Ambient mesh + noise — sits under Magic UI layers */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -30;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, oklch(0.45 0.22 280 / 0.35), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 100% 0%, oklch(0.55 0.18 200 / 0.2), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 0% 100%, oklch(0.5 0.2 310 / 0.22), transparent 45%),
+    oklch(0.09 0.02 270);
+}
+
+@layer utilities {
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent;
+  }
+  .text-gradient-subtle {
+    @apply bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent;
+  }
+  .glass-panel {
+    @apply rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] backdrop-blur-xl;
+  }
+  .glass-panel-hover {
+    @apply transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.05] hover:shadow-[0_0_40px_-12px_rgba(139,92,246,0.35)];
   }
 }

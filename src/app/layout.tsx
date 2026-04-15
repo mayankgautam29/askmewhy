@@ -1,13 +1,22 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Syne, DM_Sans } from "next/font/google";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Meteors } from "@/components/magicui/meteors";
 import { Particles } from "@/components/magicui/particles";
 
-const inter = Inter({ subsets: ["latin"] });
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-syne",
+  display: "swap",
+});
 
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Ask Me Why",
@@ -15,32 +24,25 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const color = "#ffffff"
+  const particleColor = "#a78bfa";
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-black text-gray-100`}>
+    <html lang="en" suppressHydrationWarning className={`${syne.variable} ${dmSans.variable}`}>
+      <body className={`${dmSans.className} min-h-screen bg-background text-foreground`}>
         <div className="fixed inset-0 -z-20 overflow-hidden">
-          <Meteors number={60} />
+          <Meteors number={36} />
           <Particles
-        className="absolute inset-0 z-0"
-        quantity={100}
-        ease={80}
-        color={color}
-        refresh
-      />
+            className="absolute inset-0 z-0 opacity-70"
+            quantity={72}
+            ease={85}
+            color={particleColor}
+            refresh
+          />
         </div>
-        <header className="relative z-10">
+        <div className="relative z-10 flex min-h-screen flex-col">
           <Navbar />
-          <hr></hr>
-        </header>
-        <main className="relative z-10 min-h-[calc(100vh-96px)]">
-          {children}
-        </main>
-
-        {/* Footer */}
-        <footer className="relative z-10">
+          <main className="relative z-10 flex-1">{children}</main>
           <Footer />
-        </footer>
+        </div>
       </body>
     </html>
   );

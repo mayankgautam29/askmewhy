@@ -3,14 +3,16 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Link from "next/link";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BorderBeam } from "@/components/magicui/border-beam";
-import { ShinyButton } from "@/components/magicui/shiny-button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Sparkles } from "lucide-react";
+
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(1, "Password is required"),
@@ -39,76 +41,91 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginData) => {
     try {
-      const value = await axios.post("/api/users/login", data);
+      await axios.post("/api/users/login", data);
       router.push("/");
       router.refresh();
-    } catch (error: any) {
-      sessionStorage.setItem("flashMessage","Not a valid user, signup");
+    } catch {
+      sessionStorage.setItem("flashMessage", "Not a valid user, signup");
       setTimeout(() => router.push("/signup"), 0);
     }
   };
 
   return (
-    <div className="relative w-full max-w-md mx-auto mt-20 px-6">
+    <div className="mx-auto flex min-h-[calc(100vh-12rem)] max-w-md flex-col justify-center px-4 py-16 sm:px-6">
+      <div className="mb-10 text-center">
+        <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300/80">
+          <Sparkles className="h-3.5 w-3.5" />
+          Welcome back
+        </p>
+        <h1 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-white">
+          Sign in
+        </h1>
+        <p className="mt-2 text-sm text-zinc-500">Pick up where you left off.</p>
+      </div>
+
       <div className="relative">
-        <div className="absolute -inset-1 z-0 rounded-2xl">
+        <div className="absolute -inset-px z-0 overflow-hidden rounded-2xl">
           <BorderBeam
-            size={220}
-            duration={12}
-            delay={9}
+            size={240}
+            duration={10}
+            delay={4}
+            colorFrom="#a78bfa"
+            colorTo="#22d3ee"
             className="rounded-2xl"
           />
         </div>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative z-10 flex flex-col gap-6 rounded-2xl border border-white/20 bg-black/40 p-8 shadow-xl backdrop-blur"
+          className="relative z-10 flex flex-col gap-6 rounded-2xl border border-white/[0.1] bg-zinc-950/80 p-8 shadow-2xl backdrop-blur-xl"
         >
           {flash && (
-            <div className="text-red-400 text-center text-sm bg-white/10 border border-red-500/30 rounded p-2">
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-center text-sm text-red-200">
               {flash}
             </div>
           )}
-          <div>
-            <Label htmlFor="email" className="text-white">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-zinc-200">
               Email
             </Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               {...register("email")}
-              className="mt-2"
+              className="h-11 border-white/10 bg-black/40 text-white placeholder:text-zinc-600"
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
+            {errors.email && <p className="text-sm text-red-400">{errors.email.message}</p>}
           </div>
 
-          <div>
-            <Label htmlFor="password" className="text-white">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-zinc-200">
               Password
             </Label>
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="••••••••"
               {...register("password")}
-              className="mt-2"
+              className="h-11 border-white/10 bg-black/40 text-white placeholder:text-zinc-600"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="text-sm text-red-400">{errors.password.message}</p>
             )}
           </div>
 
-          <ShinyButton type="submit" className="text-white self-center">
-            Login
-          </ShinyButton>
-          <p className="text-sm">New user? <a className="text-blue-500" href="/signup">Signup Now</a></p>
+          <button
+            type="submit"
+            className="h-11 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110"
+          >
+            Continue
+          </button>
+          <p className="text-center text-sm text-zinc-500">
+            New here?{" "}
+            <Link href="/signup" className="font-medium text-violet-300 hover:underline">
+              Create an account
+            </Link>
+          </p>
         </form>
       </div>
     </div>

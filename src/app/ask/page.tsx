@@ -8,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BorderBeam } from "@/components/magicui/border-beam";
-import { ShinyButton } from "@/components/magicui/shiny-button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Sparkles } from "lucide-react";
+
 const questionSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
   tags: z.string().min(1, "At least one tag is required"),
@@ -23,9 +23,7 @@ type QuestionData = z.infer<typeof questionSchema>;
 
 export default function AskQuestionForm() {
   const router = useRouter();
-  const [loading,setLoading] = useState(false)
-  const [userdata,setUserdata] = useState("")
-  const [flash,setFlash] = useState("")
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -37,75 +35,116 @@ export default function AskQuestionForm() {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const res = await axios.get("/api/users/profile");
         if (!res.data || !res.data.user) throw new Error("User not found");
-      } catch (error) {
+      } catch {
         sessionStorage.setItem("flashMessage", "You must log in first");
         setTimeout(() => router.push("/login"), 0);
       } finally {
         setLoading(false);
       }
     };
-    getUserData()
-  },[router])
-
+    getUserData();
+  }, [router]);
 
   const onSubmit = async (data: QuestionData) => {
     const payload = {
       ...data,
-      tags: data.tags.split(",").map(tag => tag.trim()),
+      tags: data.tags.split(",").map((tag) => tag.trim()),
     };
 
     await axios.post("/api/users/questionask", payload);
     router.push("/questions");
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center text-zinc-500">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+          <p className="text-sm">Checking your session…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full max-w-2xl mx-auto mt-20 px-6">
+    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mb-10">
+        <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300/80">
+          <Sparkles className="h-3.5 w-3.5" />
+          New thread
+        </p>
+        <h1 className="font-[family-name:var(--font-syne)] text-3xl font-bold text-white sm:text-4xl">
+          Ask a question
+        </h1>
+        <p className="mt-2 text-zinc-500">
+          Great questions include context, what you tried, and what you expected.
+        </p>
+      </div>
+
       <div className="relative">
-        <div className="absolute -inset-1 z-0 rounded-2xl">
-          <BorderBeam size={280} duration={12} delay={9} className="rounded-2xl" />
+        <div className="absolute -inset-px z-0 overflow-hidden rounded-2xl">
+          <BorderBeam
+            size={280}
+            duration={12}
+            delay={6}
+            colorFrom="#f472b6"
+            colorTo="#818cf8"
+            className="rounded-2xl"
+          />
         </div>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="relative z-10 flex flex-col gap-6 rounded-2xl border border-white/20 bg-black/40 p-8 shadow-xl backdrop-blur"
+          className="relative z-10 flex flex-col gap-6 rounded-2xl border border-white/[0.1] bg-zinc-950/80 p-8 shadow-2xl backdrop-blur-xl"
         >
-          <div>
-            <Label htmlFor="title" className="text-white">Title</Label>
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-zinc-200">
+              Title
+            </Label>
             <Input
               id="title"
               placeholder="e.g. How do closures work in JavaScript?"
               {...register("title")}
-              className="mt-2"
+              className="h-11 border-white/10 bg-black/40 text-white placeholder:text-zinc-600"
             />
-            {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+            {errors.title && <p className="text-sm text-red-400">{errors.title.message}</p>}
           </div>
-          <div>
-            <Label htmlFor="tags" className="text-white">Tags (comma-separated)</Label>
+          <div className="space-y-2">
+            <Label htmlFor="tags" className="text-zinc-200">
+              Tags <span className="font-normal text-zinc-500">(comma-separated)</span>
+            </Label>
             <Input
               id="tags"
-              placeholder="e.g. javascript, closures, functions"
+              placeholder="javascript, closures, functions"
               {...register("tags")}
-              className="mt-2"
+              className="h-11 border-white/10 bg-black/40 text-white placeholder:text-zinc-600"
             />
-            {errors.tags && <p className="text-red-500 text-sm mt-1">{errors.tags.message}</p>}
+            {errors.tags && <p className="text-sm text-red-400">{errors.tags.message}</p>}
           </div>
-          <div>
-            <Label htmlFor="content" className="text-white">Content</Label>
+          <div className="space-y-2">
+            <Label htmlFor="content" className="text-zinc-200">
+              Details
+            </Label>
             <Textarea
               id="content"
-              placeholder="Describe your question in detail..."
+              placeholder="Describe your question, include code or errors if relevant…"
               {...register("content")}
-              className="mt-2"
+              className="min-h-40 border-white/10 bg-black/40 text-white placeholder:text-zinc-600"
             />
-            {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
+            {errors.content && (
+              <p className="text-sm text-red-400">{errors.content.message}</p>
+            )}
           </div>
 
-          <ShinyButton type="submit" className="text-white self-center">
-            Ask Question
-          </ShinyButton>
+          <button
+            type="submit"
+            className="h-12 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110"
+          >
+            Publish question
+          </button>
         </form>
       </div>
     </div>

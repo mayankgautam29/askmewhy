@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type VoteButtonProps = {
   targetId: string;
@@ -18,7 +19,7 @@ export default function VoteButton({
 }: VoteButtonProps) {
   const [score, setScore] = useState(initialScore);
   const [voteStatus, setVoteStatus] = useState<"up" | "down" | null>(null);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const fetchVote = async () => {
@@ -54,8 +55,9 @@ export default function VoteButton({
         setVoteStatus(voteType);
         setScore((prev) => (voteType === "up" ? prev + 2 : prev - 2));
       }
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number } };
+      if (err.response?.status === 401) {
         sessionStorage.setItem("flashMessage", "You must log in first");
         setTimeout(() => router.push("/login"), 0);
       } else {
@@ -65,23 +67,39 @@ export default function VoteButton({
   };
 
   return (
-    <div className="flex flex-col items-center gap-1 mr-4 text-white">
+    <div
+      className={cn(
+        "flex shrink-0 flex-col items-center gap-0.5 rounded-2xl border border-white/[0.08] bg-black/30 p-1.5 shadow-inner backdrop-blur-sm"
+      )}
+    >
       <button
+        type="button"
         onClick={() => handleVote("up")}
-        className={`hover:text-green-400 ${
-          voteStatus === "up" ? "text-green-500" : ""
-        }`}
+        aria-label="Upvote"
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-xl transition",
+          voteStatus === "up"
+            ? "bg-emerald-500/20 text-emerald-300"
+            : "text-zinc-500 hover:bg-white/5 hover:text-emerald-300"
+        )}
       >
-        <ArrowUp />
+        <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
       </button>
-      <span>{score}</span>
+      <span className="min-w-[2rem] py-0.5 text-center text-sm font-semibold tabular-nums text-white">
+        {score}
+      </span>
       <button
+        type="button"
         onClick={() => handleVote("down")}
-        className={`hover:text-red-400 ${
-          voteStatus === "down" ? "text-red-500" : ""
-        }`}
+        aria-label="Downvote"
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-xl transition",
+          voteStatus === "down"
+            ? "bg-red-500/20 text-red-300"
+            : "text-zinc-500 hover:bg-white/5 hover:text-red-300"
+        )}
       >
-        <ArrowDown />
+        <ArrowDown className="h-4 w-4" strokeWidth={2.5} />
       </button>
     </div>
   );
