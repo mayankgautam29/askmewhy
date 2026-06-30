@@ -19,8 +19,18 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Ask Me Why",
-  description: "A Q&A community with Magic UI flair",
+  title: {
+    default: "Ask Me Why",
+    template: "%s · Ask Me Why",
+  },
+  description: "A Q&A community with Magic UI flair — ask hard questions, share sharp answers.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"),
+  openGraph: {
+    title: "Ask Me Why",
+    description: "A Q&A community for curious builders.",
+    siteName: "Ask Me Why",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
