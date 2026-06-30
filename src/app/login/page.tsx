@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 
 const loginSchema = z.object({
@@ -20,9 +20,11 @@ const loginSchema = z.object({
 
 type LoginData = z.infer<typeof loginSchema>;
 
-export default function LoginForm() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [flash, setFlash] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
@@ -41,12 +43,18 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginData) => {
     try {
+      setSubmitting(true);
       await axios.post("/api/users/login", data);
-      router.push("/");
+      const redirect = searchParams.get("redirect");
+      const safeRedirect =
+        redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/";
+      router.push(safeRedirect);
       router.refresh();
     } catch {
       sessionStorage.setItem("flashMessage", "Not a valid user, signup");
       setTimeout(() => router.push("/signup"), 0);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -116,9 +124,10 @@ export default function LoginForm() {
 
           <button
             type="submit"
-            className="h-11 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110"
+            disabled={submitting}
+            className="h-11 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Continue
+            {submitting ? "Signing in…" : "Continue"}
           </button>
           <p className="text-center text-sm text-zinc-500">
             New here?{" "}
@@ -129,5 +138,19 @@ export default function LoginForm() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[50vh] items-center justify-center text-sm text-zinc-500">
+          Loading…
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -24,6 +24,7 @@ type SignupData = z.infer<typeof signupSchema>;
 export default function SignupForm() {
   const router = useRouter();
   const [flash, setFlash] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
@@ -42,10 +43,13 @@ export default function SignupForm() {
 
   const onSubmit = async (data: SignupData) => {
     try {
+      setSubmitting(true);
       await axios.post("/api/users/signup", data);
       router.push("/login");
     } catch {
       setFlash("Could not sign up. Try a different email or username.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -131,9 +135,10 @@ export default function SignupForm() {
 
           <button
             type="submit"
-            className="h-11 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110"
+            disabled={submitting}
+            className="h-11 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Sign up
+            {submitting ? "Creating account…" : "Sign up"}
           </button>
           <p className="text-center text-sm text-zinc-500">
             Already have an account?{" "}

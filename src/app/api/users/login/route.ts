@@ -29,10 +29,17 @@ export async function POST(request: NextRequest){
             message: "Login Successfull",
             success: true
         })
-        response.cookies.set('token',token,{httpOnly: true})
+        response.cookies.set("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 60 * 60 * 24,
+        });
         return response;
-    } catch (error:any) {
-        NextResponse.json({error: error.message},{status: 500})
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Login failed";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
 

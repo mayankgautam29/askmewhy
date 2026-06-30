@@ -24,6 +24,8 @@ type QuestionData = z.infer<typeof questionSchema>;
 export default function AskQuestionForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -54,8 +56,16 @@ export default function AskQuestionForm() {
       tags: data.tags.split(",").map((tag) => tag.trim()),
     };
 
-    await axios.post("/api/users/questionask", payload);
-    router.push("/questions");
+    try {
+      setSubmitting(true);
+      setSubmitError(null);
+      await axios.post("/api/users/questionask", payload);
+      router.push("/questions");
+    } catch {
+      setSubmitError("Could not publish your question. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -100,6 +110,11 @@ export default function AskQuestionForm() {
           onSubmit={handleSubmit(onSubmit)}
           className="relative z-10 flex flex-col gap-6 rounded-2xl border border-white/[0.1] bg-zinc-950/80 p-8 shadow-2xl backdrop-blur-xl"
         >
+          {submitError && (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-center text-sm text-red-200">
+              {submitError}
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="title" className="text-zinc-200">
               Title
@@ -141,9 +156,10 @@ export default function AskQuestionForm() {
 
           <button
             type="submit"
-            className="h-12 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110"
+            disabled={submitting}
+            className="h-12 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Publish question
+            {submitting ? "Publishing…" : "Publish question"}
           </button>
         </form>
       </div>

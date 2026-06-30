@@ -34,7 +34,7 @@ export default function Navbar() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await axios.get("/api/users/logout");

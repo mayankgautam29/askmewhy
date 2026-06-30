@@ -1,15 +1,36 @@
 import mongoose from "mongoose";
-export async function connect(){
-    try {
-        await mongoose.connect(process.env.MONGO_URI!)
-        const connection = mongoose.connection;
-        connection.on('connected',() => {
-            console.log("Database connected successfully");
-        })
-        connection.on('error',() => {
-            console.log("Some error connecting the database");
-        })
-    } catch (error:any) {
-        console.log(error.message)
-    }
+
+const MONGO_URI = process.env.MONGO_URI;
+
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var mongooseCache: MongooseCache | undefined;
+}
+
+const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
+if (!global.mongooseCache) {
+  global.mongooseCache = cached;
+}
+
+export async function connect() {
+  if (!MONGO_URI) {
+    console.warn("MONGO_URI is not defined — skipping database connection");
+    return null;
+  }
+
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGO_URI);
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
