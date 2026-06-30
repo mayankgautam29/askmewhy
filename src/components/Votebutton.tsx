@@ -22,6 +22,10 @@ export default function VoteButton({
   const router = useRouter();
 
   useEffect(() => {
+    setScore(initialScore);
+  }, [initialScore]);
+
+  useEffect(() => {
     const fetchVote = async () => {
       try {
         const res = await axios.post("/api/users/getvote", {

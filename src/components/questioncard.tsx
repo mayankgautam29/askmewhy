@@ -41,7 +41,7 @@ export default function QuestionCard({ ques }: QuestionProps) {
               {ques.title}
             </h2>
             <div className="flex flex-wrap gap-2">
-              {ques.tags.map((tag) => (
+              {ques.tags?.map((tag) => (
                 <span
                   key={tag._id}
                   className="rounded-full border border-violet-400/20 bg-violet-500/10 px-2.5 py-0.5 text-xs font-medium text-violet-200/90"

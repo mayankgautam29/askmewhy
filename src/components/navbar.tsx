@@ -37,11 +37,14 @@ export default function Navbar() {
   }, [pathname]);
 
   const handleLogout = async () => {
-    await axios.get("/api/users/logout");
-    setUser(false);
-    setOpen(false);
-    router.push("/");
-    router.refresh();
+    try {
+      await axios.get("/api/users/logout");
+    } finally {
+      setUser(false);
+      setOpen(false);
+      router.push("/");
+      router.refresh();
+    }
   };
 
   return (

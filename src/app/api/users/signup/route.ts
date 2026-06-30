@@ -22,7 +22,15 @@ export async function POST(request: NextRequest){
         })
         const savedUser = await newUser.save()
 
-        return NextResponse.json({message: "User created successfully",success: true,savedUser})
+        return NextResponse.json({
+            message: "User created successfully",
+            success: true,
+            user: {
+                id: savedUser._id,
+                username: savedUser.username,
+                email: savedUser.email,
+            },
+        })
     } catch (error:any) {
         return NextResponse.json({error: error.message},{status: 500})
     }

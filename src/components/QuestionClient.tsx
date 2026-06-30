@@ -22,6 +22,8 @@ type QuestionData = z.infer<typeof answerSchema>;
 
 export default function QuestionClient({ id }: { id: string }) {
   const [isLoading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [answerError, setAnswerError] = useState<string | null>(null);
   const [question, setQuestion] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const router = useRouter();
@@ -51,6 +53,8 @@ export default function QuestionClient({ id }: { id: string }) {
 
   const onSubmit = async (data: QuestionData) => {
     try {
+      setSubmitting(true);
+      setAnswerError(null);
       await axios.post(
         "/api/users/answeradd",
         { content: data.content, question: id },
@@ -58,8 +62,10 @@ export default function QuestionClient({ id }: { id: string }) {
       );
       reset();
       await fetchQuestion();
-    } catch (error) {
-      console.error("Error submitting answer:", error);
+    } catch {
+      setAnswerError("Could not post your answer. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -69,14 +75,24 @@ export default function QuestionClient({ id }: { id: string }) {
 
   const delSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await axios.post("/api/users/delquestion", { id: question._id });
-    router.push("/questions");
+    if (!window.confirm("Delete this question permanently?")) return;
+    try {
+      await axios.post("/api/users/delquestion", { id: question._id });
+      router.push("/questions");
+    } catch {
+      setAnswerError("Could not delete this question.");
+    }
   };
 
   const delAnswer = async (e: React.FormEvent, answerId: string) => {
     e.preventDefault();
-    await axios.post("/api/users/delanswer", { id: answerId });
-    fetchQuestion();
+    if (!window.confirm("Delete this answer?")) return;
+    try {
+      await axios.post("/api/users/deleteanswer", { id: answerId });
+      await fetchQuestion();
+    } catch {
+      setAnswerError("Could not delete this answer.");
+    }
   };
 
   if (isLoading) {
@@ -239,6 +255,11 @@ export default function QuestionClient({ id }: { id: string }) {
 
         {currentUser ? (
           <form onSubmit={handleSubmit(onSubmit)} className="glass-panel mt-10 space-y-4 p-6 sm:p-8">
+            {answerError && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-center text-sm text-red-200">
+                {answerError}
+              </div>
+            )}
             <Label htmlFor="content" className="text-sm font-medium text-zinc-200">
               Your answer
             </Label>
@@ -251,13 +272,20 @@ export default function QuestionClient({ id }: { id: string }) {
             {errors.content && (
               <p className="text-sm text-red-400">{errors.content.message}</p>
             )}
-            <RainbowButton type="submit" className="px-8 py-3 text-sm font-semibold text-white">
-              Post answer
+            <RainbowButton
+              type="submit"
+              disabled={submitting}
+              className="px-8 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? "Posting…" : "Post answer"}
             </RainbowButton>
           </form>
         ) : (
           <div className="glass-panel mt-10 p-6 text-center text-zinc-400">
-            <Link href="/login" className="font-semibold text-violet-300 hover:underline">
+            <Link
+              href={`/login?redirect=${encodeURIComponent(`/questions/${id}`)}`}
+              className="font-semibold text-violet-300 hover:underline"
+            >
               Sign in
             </Link>{" "}
             to share an answer.

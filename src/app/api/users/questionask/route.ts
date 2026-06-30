@@ -12,7 +12,10 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const authorId = await getDataFromToken(request);
-    console.log("Author ID:", authorId);
+    if (!authorId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { title, content, tags } = await request.json();
 
     if (!title || !content || !tags) {
@@ -48,7 +51,7 @@ export async function POST(request: NextRequest) {
         question: newQuestion._id,
       }
     );
-    return NextResponse.json({ message: saved, success: true });
+    return NextResponse.json({ message: "Question created", success: true, id: saved._id });
   } catch (error: any) {
     console.error("❌ Server Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

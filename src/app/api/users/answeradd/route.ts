@@ -12,6 +12,10 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const author = await getDataFromToken(request);
+    if (!author) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const reqBody = await request.json();
     const { content, question } = reqBody;
     if (!content || !question) {
@@ -39,7 +43,6 @@ export async function POST(request: NextRequest) {
       }
     )
     const saved = await newAnswer.save();
-    console.log("Saved")
     return NextResponse.json({
       data: saved,
       success: true,

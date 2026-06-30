@@ -45,6 +45,7 @@ export default function SignupForm() {
     try {
       setSubmitting(true);
       await axios.post("/api/users/signup", data);
+      sessionStorage.setItem("flashMessage", "Account created — sign in to continue");
       router.push("/login");
     } catch {
       setFlash("Could not sign up. Try a different email or username.");

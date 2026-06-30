@@ -10,8 +10,9 @@ export const getDataFromToken = async (request: NextRequest): Promise<string | n
       id: string;
     };
     return decodedToken.id;
-  } catch (error: any) {
-    console.error("JWT Verification failed:", error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Invalid token";
+    console.error("JWT Verification failed:", message);
     return null;
   }
 };

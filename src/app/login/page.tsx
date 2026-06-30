@@ -88,7 +88,13 @@ function LoginForm() {
           className="relative z-10 flex flex-col gap-6 rounded-2xl border border-white/[0.1] bg-zinc-950/80 p-8 shadow-2xl backdrop-blur-xl"
         >
           {flash && (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-center text-sm text-red-200">
+            <div
+              className={
+                flash.includes("Account created")
+                  ? "rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-center text-sm text-emerald-200"
+                  : "rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-center text-sm text-red-200"
+              }
+            >
               {flash}
             </div>
           )}

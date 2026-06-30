@@ -12,6 +12,7 @@ export default function ProfilePage() {
     username: string;
     email: string;
     reputation: number;
+    createdAt?: string;
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -96,8 +97,14 @@ export default function ProfilePage() {
                 <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   Member since
                 </p>
-                <p className="mt-3 text-lg font-medium text-zinc-300">Soon™</p>
-                <p className="mt-1 text-sm text-zinc-600">We&apos;ll backfill history soon.</p>
+                <p className="mt-3 text-lg font-medium text-zinc-300">
+                  {userdata.createdAt
+                    ? new Date(userdata.createdAt).toLocaleDateString(undefined, {
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "Recently joined"}
+                </p>
               </div>
             </div>
           </div>
